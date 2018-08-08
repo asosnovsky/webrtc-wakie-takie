@@ -1,0 +1,22 @@
+{
+  "scripts": {
+    "serve": "parcel serve src/index.html",
+    "build": "parcel build src/index.html -d dist",
+    "serve-build": "npm run build && firebase serve",
+    "deploy": "npm run build && firebase deploy --only hosting"
+  },
+  "dependencies": {
+    "jsqr": "1.1.1",
+    "qrcode.react": "0.8.0",
+    "react": "16.4.2",
+    "react-dom": "16.4.2",
+    "tslib": "1.9.3"
+  },
+  "devDependencies": {
+    "@types/react": "16.4.8",
+    "@types/react-dom": "16.0.7",
+    "@types/webrtc": "0.0.23",
+    "parcel-plugin-clean-dist": "0.0.6",
+    "typescript": "3.0.1"
+  }
+}
