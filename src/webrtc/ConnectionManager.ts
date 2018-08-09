@@ -3,7 +3,7 @@ import CallToken from "./CallToken";
 
 import Console from "../Console";
 
-const console = new Console("[[ConnectionManager]]", 0);
+const console = new Console("[[ConnectionManager]]", 1);
 
 export interface ChannelMessage {
     data: string;
@@ -123,7 +123,9 @@ export default class ConnectionManager {
         console.log("======Token Creation====")
         const name = Date.now() + Math.random().toString(36);
         const { connection: localConnection, iceGatherer } = this.createConnection(name);
-        this.saveChannel(name, localConnection.createDataChannel('data-channel'));
+        let dc: RTCDataChannel;
+        this.saveChannel(name, dc = localConnection.createDataChannel('data-channel'));
+        console.log(dc);
         const offer = await localConnection.createOffer();
         await localConnection.setLocalDescription(offer);
         console.log("======Token Made====")
@@ -134,39 +136,16 @@ export default class ConnectionManager {
         )
     }
 
-    public async connectWithCallToken(token: CallToken): Promise<CallToken | void> {
-        switch (token.type) {
-            case 'offer': 
-                const {connection: remoteConnection, iceGatherer} = this.createConnection(token.name);
-                const offer = new RTCSessionDescription(token.session);
-                await remoteConnection.setRemoteDescription(offer as any);
-                const answer = await remoteConnection.createAnswer();
-                await remoteConnection.setLocalDescription(answer);
-                return new CallToken(
-                    token.name,
-                    answer,
-                    iceGatherer,
-                );
-            case 'answer':
-                const localConnection = this.connections.get(token.name);
-                if (localConnection) {
-                    const ans = new RTCSessionDescription(token.session);
-                    await localConnection.setRemoteDescription(ans as any);
-                    return;
-                }   else {
-                    throw Error('Answering invalid call');
-                }
-            default:
-                throw Error('Invalid Token.type = ' + token.type);
-        }
-    }
-
     public async connectWithCallTokenString(s: string) {
         const {name, ices, session} = CallToken.parseString(s);
+        console.log({
+            ices
+        })
         switch (session.type) {
             case 'offer': 
                 const {connection: remoteConnection, iceGatherer} = this.createConnection(name);
-                ices.forEach( ice => iceGatherer.addIce(ice) );
+                ices.forEach( ice => remoteConnection.addIceCandidate(ice) );
+                console.log(iceGatherer);
                 const offer = new RTCSessionDescription(session);
                 await remoteConnection.setRemoteDescription(offer as any);
                 const answer = await remoteConnection.createAnswer();

@@ -11,7 +11,7 @@ class ChatEntry extends React.Component<ChatMessage> {
     public render() {
         return <li>
             <b>From</b>: {this.props.fromMe ? "You" : "Them"}<br/>
-            <span>{this.props.message}</span><br/>
+            <b>Message</b>: <span>{this.props.message}</span><br/>
             <i>{this.props.time.toNow()}</i>
         </li>
     }

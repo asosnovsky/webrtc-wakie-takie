@@ -25,6 +25,12 @@ export default class CallToken {
         return this.session.type;
     }
     public async toString(): Promise<string> {
+        // let ices: RTCIceCandidate[]
+        // if ( this.type === 'answer' ) {
+        //     ices = [];
+        // }   else    {
+        //     ices = await this.ice.awaitCompletion();
+        // }
         const ices = await this.ice.awaitCompletion();
         const icesString = pad(ices.length, 3) + ices.reduce( (s, ice) => {
             return s + pad(String(ice.candidate).length, 3) + String(ice.candidate) + 
