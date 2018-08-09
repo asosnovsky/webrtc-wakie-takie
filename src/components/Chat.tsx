@@ -1,15 +1,18 @@
 import * as React from "react";
 import webrtc from "../webrtc";
 import Console from "../Console";
+import moment, { Moment } from "moment";
 
-const console = new Console("[[Chat]]", 0);
 
-interface ChatMessage {message: string, fromMe: boolean};
+const console = new Console("[[Chat]]", 1);
+
+interface ChatMessage {message: string, fromMe: boolean, time: Moment};
 class ChatEntry extends React.Component<ChatMessage> {
     public render() {
         return <li>
             <b>From</b>: {this.props.fromMe ? "You" : "Them"}<br/>
-            <span>{this.props.message}</span>
+            <span>{this.props.message}</span><br/>
+            <i>{this.props.time.toNow()}</i>
         </li>
     }
 }
@@ -31,7 +34,7 @@ export default class extends React.Component<IProps, IState> {
                     this.setState({
                         messages: [
                             ...this.state.messages,
-                            { message: msg.data, fromMe: false },
+                            { message: msg.data, fromMe: false, time: moment() },
                         ]
                     })
                 } 
@@ -46,31 +49,40 @@ export default class extends React.Component<IProps, IState> {
                 this.setState({
                     messages: [
                         ...this.state.messages,
-                        { message: this.state.currentMessage, fromMe: true },
+                        { message: this.state.currentMessage, fromMe: true, time: moment() },
                     ],
                     currentMessage: "",
                 })
            ])
+       }    else    {
+           this.setState({
+               currentMessage: "",
+           })
        }
     }
 
     public render() {
-        return <div>
-            <h4>Message Board: {this.props.connectionName}</h4>
-            <ul>
-                {this.state.messages.map( (msg, idx) => <ChatEntry {...msg} key={idx}/> )}
-            </ul>
-            <form onSubmit={e => {
-                e.preventDefault();
-                this.sendMessage();
-            }}>
-                <input type="text" onKeyDown={ e => {
-                    this.setState({
-                        currentMessage: e.currentTarget.value,
-                    })
-                }}/>
-                <button type="submit">Send</button>
-            </form>
-        </div>
+        if ( this.props.connectionName ) {
+            return <div>
+                <h4>Message Board: {this.props.connectionName}</h4>
+                <ul>
+                    {this.state.messages.map( (msg, idx) => <ChatEntry {...msg} key={idx}/> )}
+                </ul>
+                <form onSubmit={e => {
+                    e.preventDefault();
+                    this.sendMessage();
+                }}>
+                    <input type="text" onChange={ e => {
+                        this.setState({
+                            currentMessage: e.currentTarget.value,
+                        })
+                        console.log([e.currentTarget.value, this.state]);
+                    }} value={this.state.currentMessage}/>
+                    <button type="submit">Send</button>
+                </form>
+            </div>
+        }   else    {
+            return <div></div>
+        }
     }
 }

@@ -12,6 +12,7 @@ interface Point {
 }
 export interface IProps {
     onCode?: (t: string) => void;
+    size: number;
 }
 export default class QrScanner extends React.Component<IProps> {
 
@@ -51,8 +52,8 @@ export default class QrScanner extends React.Component<IProps> {
             const canvas = this.canvasCtx;
             const video = this.elmVideo;
             if ( canvasElement && canvas) {
-                canvasElement.height = video.videoHeight;
-                canvasElement.width  = video.videoWidth;
+                video.height = canvasElement.height = this.props.size;
+                video.width = canvasElement.width  = this.props.size;
                 canvas.drawImage(video, 0, 0, canvasElement.width, canvasElement.height);
                 const imageData = canvas.getImageData(0, 0, canvasElement.width, canvasElement.height);
                 const code = jsQR(imageData.data, imageData.width, imageData.height);
